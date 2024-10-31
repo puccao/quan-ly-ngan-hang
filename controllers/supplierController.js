@@ -1,6 +1,6 @@
 const Supplier = require('../models/supplier');
 const Customer = require('../models/customer');
-const Bill = require('../models/bill'); // Model hóa đơn
+const Bill = require('../models/bill'); 
 
 // Danh sách nhà cung cấp
 exports.listSuppliers = async (req, res) => {
@@ -29,14 +29,14 @@ exports.deleteSupplier = async (req, res) => {
 
 // Tạo hóa đơn cho khách hàng
 exports.createBillForm = async (req, res) => {
-    const customers = await Customer.find(); // Lấy danh sách khách hàng
-    const supplier = await Supplier.findById(req.params.id); // Nhà cung cấp hiện tại
+    const customers = await Customer.find(); 
+    const supplier = await Supplier.findById(req.params.id); 
     res.render('suppliers/createBill', { supplier, customers });
 };
 
 exports.createBill = async (req, res) => {
     const { customerId, billAmount } = req.body;
-    const supplier = await Supplier.findById(req.params.id); // Nhà cung cấp hiện tại
+    const supplier = await Supplier.findById(req.params.id); 
     await Bill.create({
         customerId,
         billAmount,

@@ -289,14 +289,26 @@
                         <div class="card-body">
                             <h4 class="card-title">Sửa nhân viên</h4><br>
                             <form action="/employees/edit/<%= employee._id %>" method="POST">
-                                <input type="text" name="name" value="<%= employee.name %>" required>
-                                <select name="position" required>
-                                    <option value="employee" <%= employee.position === 'employee' ? 'selected' : '' %>>Nhân viên</option>
-                                    <option value="admin" <%= employee.position === 'admin' ? 'selected' : '' %>>Admin</option>
-                                </select>
-                                <input type="email" name="email" value="<%= employee.email %>" required>
-                                <input type="text" name="username" value="<%= employee.username %>" required>
-                                <button type="submit">Cập nhật nhân viên</button>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail3">Tên:</label>
+                                    <input type="text" class="form-control" name="name" value="<%= employee.name %>" required>
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-select" name="position" required>
+                                        <label for="exampleInputEmail3">Vị trí:</label>
+                                        <option value="employee" <%= employee.position === 'employee' ? 'selected' : '' %>>Nhân viên</option>
+                                        <option value="admin" <%= employee.position === 'admin' ? 'selected' : '' %>>Admin</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail3">Gmail:</label>
+                                    <input type="email" class="form-control" name="email" value="<%= employee.email %>" required>
+                                </div> 
+                                <div>
+                                    <label for="exampleInputEmail3">Tài khoản:</label>
+                                    <input type="text" class="form-control" name="username" value="<%= employee.username %>" required>
+                                </div><br>
+                                <button type="submit" class="btn btn-gradient-primary me-2">Cập nhật nhân viên</button>
                             </form>
                         </div>
                     </div>

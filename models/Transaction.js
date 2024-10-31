@@ -5,9 +5,9 @@ const transactionSchema = new mongoose.Schema({
     billId: { type: mongoose.Schema.Types.ObjectId, ref: 'Bill', required: true },
     amount: { type: Number, required: true },
     date: { type: Date, default: Date.now },
-    status: { type: String, default: 'Success' } // 'Success', 'Failed', 'Pending'
+    status: { type: String, default: 'Success' } 
 }, {
-    timestamps: true // Tự động tạo createdAt và updatedAt
+    timestamps: true 
 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

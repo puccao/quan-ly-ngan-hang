@@ -16,7 +16,8 @@ const customerSchema = new mongoose.Schema({
     balance: { type: Number, default: 0 },
     account: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Account' // Tham chiếu đến mô hình Account
+        ref: 'Account', // Tham chiếu đến mô hình Account
+        required: true,
     }
 });
 

@@ -12,15 +12,22 @@ exports.addEmployeeForm = (req, res) => {
 exports.addEmployee = async (req, res) => {
     const { name, position, email, username, password } = req.body;
 
-    // Kiểm tra xem email đã tồn tại chưa
-    const existingEmployee = await Employee.findOne({ email });
-    if (existingEmployee) {
-        return res.status(400).send('Email đã tồn tại. Vui lòng sử dụng email khác.');
-    }
+    console.log(req.body); 
 
-    // Thêm nhân viên mới
-    await Employee.create({ name, position, email, username, password });
-    res.redirect('/employees');
+    try {
+        
+        const existingEmployee = await Employee.findOne({ email });
+        if (existingEmployee) {
+            return res.status(400).send('Email đã tồn tại. Vui lòng sử dụng email khác.');
+        }
+
+        
+        const newEmployee = await Employee.create({ name, position, email, username, password });
+        res.redirect('/employees');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Có lỗi xảy ra khi thêm nhân viên. Vui lòng kiểm tra lại.');
+    }
 };
 
 exports.editEmployeeForm = async (req, res) => {

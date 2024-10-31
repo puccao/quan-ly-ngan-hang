@@ -9,14 +9,14 @@ router.get('/', (req, res) => {
 
 // Xử lý đăng nhập
 router.post('/', async (req, res) => {
-    const { username, password } = req.body; // Lấy username và password từ form
-    const employee = await Employee.findOne({ username, password }); // Tìm employee
+    const { username, password } = req.body; 
+    const employee = await Employee.findOne({ username, password }); 
 
     if (employee) {
         req.session.employeeId = employee._id; // Lưu ID của employee vào session
-        res.redirect('/'); // Chuyển hướng đến trang chính
+        res.redirect('/'); 
     } else {
-        res.redirect('/login'); // Nếu không tìm thấy, quay lại trang login
+        res.redirect('/login'); 
     }
 });
 

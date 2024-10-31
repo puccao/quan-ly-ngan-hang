@@ -4,7 +4,7 @@ const Account = require('../models/account');
 // Lấy danh sách khách hàng
 exports.listCustomers = async (req, res) => {
     try {
-        const customers = await Customer.find().populate('account'); // Sử dụng populate để lấy thông tin tài khoản
+        const customers = await Customer.find().populate('account'); 
         res.render('customers/customerList', { customers });
     } catch (error) {
         console.error(error);
@@ -21,21 +21,35 @@ exports.addCustomerForm = (req, res) => {
 exports.addCustomer = async (req, res) => {
     const { name, phoneNumber, idCard } = req.body;
 
-    // Tạo khách hàng mới
-    const newCustomer = await Customer.create({ name, phoneNumber, idCard });
-
     // Tạo số tài khoản ngẫu nhiên
-    const accountNumber = `ACC${Math.floor(100000 + Math.random() * 900000)}`; // Tạo số tài khoản ngẫu nhiên
+    const accountNumber = `ACC${Math.floor(100000 + Math.random() * 900000)}`; 
 
-    // Tạo tài khoản mới cho khách hàng
-    const newAccount = await Account.create({ accountNumber: accountNumber, balance: 0, customer: newCustomer._id });
+    try {
+        // Tạo tài khoản mới trước
+        const newAccount = await Account.create({ 
+            accountNumber: accountNumber, 
+            balance: 0 
+        });
 
-    // Cập nhật thông tin tài khoản vào khách hàng
-    newCustomer.account = newAccount._id; // Gán tài khoản cho khách hàng
-    await newCustomer.save(); // Lưu lại khách hàng với thông tin tài khoản
+        // Tạo khách hàng mới và gán ID tài khoản vào khách hàng
+        const newCustomer = await Customer.create({ 
+            name, 
+            phoneNumber, 
+            idCard,
+            account: newAccount._id 
+        });
 
-    res.redirect('/customers');
+        // Cập nhật customerId cho tài khoản
+        newAccount.customerId = newCustomer._id; // Gán ID khách hàng cho tài khoản
+        await newAccount.save(); // Lưu tài khoản với customerId mới
+
+        res.redirect('/customers');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Có lỗi xảy ra trong quá trình thêm khách hàng.");
+    }
 };
+
 
 // Form chỉnh sửa khách hàng
 exports.editCustomerForm = async (req, res) => {

@@ -5,7 +5,7 @@ const billSchema = new mongoose.Schema({
     supplier: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier' },
     serviceType: String,
     billAmount: Number,
-    status: { type: String, default: 'Pending' } // Có thể là 'Pending', 'Paid'
+    status: { type: String, default: 'Pending' } 
 });
 
 module.exports = mongoose.model('Bill', billSchema);

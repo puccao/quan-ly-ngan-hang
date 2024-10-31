@@ -8,14 +8,14 @@ const accountSchema = new mongoose.Schema({
     customerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Customer', // Tham chiếu tới model Customer
-        required: true,
+        required: false,
     },
     accountNumber: {
         type: String,
         required: true,
         unique: true,
     },
-    // Các trường khác nếu có
+   
 });
 
 const Account = mongoose.model('Account', accountSchema);

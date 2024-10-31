@@ -300,7 +300,7 @@
                                             <% accounts.forEach(account => { %>
                                                 <tr>
                                                     <td>
-                                                        <%= account.customer ? account.customer.name : 'Chưa có khách hàng' %>
+                                                        <%= account.customerId ? account.customerId.name : 'Chưa có khách hàng' %> <!-- Cập nhật để sử dụng customerId -->
                                                     </td>
                                                     <td>
                                                         <%= account.accountNumber %>
@@ -315,11 +315,10 @@
                                                         <a style="color: white;" href="/accounts/withdraw/<%= account._id %>">Rút Tiền</a> | 
                                                         <!-- Nút chuyển tiền -->
                                                         <a style="color: white;" href="/accounts/transfer/<%= account._id %>">Chuyển Tiền</a> | 
-                                                        <!-- <a style="color: white;" href="/accounts/edit/<%= account._id %>">Sửa</a> | -->
                                                         <a style="color: white;" href="/accounts/delete/<%= account._id %>">Xoá</a>
                                                     </td>
                                                 </tr>
-                                                <% }) %>
+                                            <% }) %>
                                         </tbody>
                                     </table>
                                 </div>

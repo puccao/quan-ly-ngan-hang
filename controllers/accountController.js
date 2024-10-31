@@ -3,7 +3,7 @@ const Customer = require('../models/customer');
 
 exports.listAccounts = async (req, res) => {
     try {
-        const accounts = await Account.find().populate('customer'); // Kiểm tra lại dòng này
+        const accounts = await Account.find().populate('customerId'); 
         res.render('accounts/accountList', { accounts });
     } catch (error) {
         console.error(error);
@@ -12,7 +12,7 @@ exports.listAccounts = async (req, res) => {
 };
 
 exports.editAccountForm = async (req, res) => {
-    const account = await Account.findById(req.params.id).populate('customer');
+    const account = await Account.findById(req.params.id).populate('customerId');
     res.render('accounts/editAccount', { account });
 };
 
@@ -50,7 +50,6 @@ exports.withdraw = async (req, res) => {
         account.balance -= amount; // Rút tiền khỏi tài khoản
         await account.save();
     } else {
-        // Xử lý nếu số dư không đủ
         req.flash('error', 'Số dư không đủ để thực hiện giao dịch!');
     }
     res.redirect('/accounts');
@@ -58,15 +57,15 @@ exports.withdraw = async (req, res) => {
 
 exports.transferForm = async (req, res) => {
     const accountId = req.params.id; // ID của tài khoản gửi
-    const account = await Account.findById(accountId).populate('customer'); // Tìm tài khoản gửi
+    const account = await Account.findById(accountId).populate('customerId'); // Tìm tài khoản gửi
 
-    const allAccounts = await Account.find().populate('customer'); // Lấy tất cả tài khoản
+    const allAccounts = await Account.find().populate('customerId'); // Lấy tất cả tài khoản
 
     if (!account) {
         return res.status(404).send('Tài khoản không tồn tại');
     }
 
-    res.render('accounts/transfer', { account, allAccounts }); // Truyền tài khoản gửi và tất cả tài khoản vào view
+    res.render('accounts/transfer', { account, allAccounts }); 
 };
 
 
@@ -98,6 +97,6 @@ exports.transfer = async (req, res) => {
     await sourceAccount.save();
     await targetAccount.save();
 
-    res.redirect('/accounts'); // Chuyển hướng về danh sách tài khoản
+    res.redirect('/accounts'); 
 };
 

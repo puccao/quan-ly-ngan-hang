@@ -5,7 +5,7 @@ const accountController = require('../controllers/accountController');
 // Hiển thị danh sách tài khoản
 router.get('/', accountController.listAccounts);
 
-// Thêm tài khoản (nếu cần)
+// Thêm tài khoản 
 // router.get('/add', accountController.addAccountForm);
 // router.post('/add', accountController.addAccount);
 
