@@ -4,10 +4,13 @@ const mongoose = require('mongoose');
 const path = require('path');
 const app = express();
 const socketIo = require('socket.io');
+const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const sessionMiddleware = require('socket.io-express-session');
 
 const http = require('http');
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = require('socket.io')(server);
 
 
 const session = require('express-session');
@@ -17,14 +20,21 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true })); 
+app.use(cors());
 
 app.use(session({
-    secret: 'your-secret-key', // Replace with your own secret key
+    secret: 'your-secret-key',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: {
+        secure: false, // Đặt true nếu sử dụng HTTPS
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // Cookie sống 24 giờ
+    }
 }));
+
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -34,12 +44,57 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('MongoDB connected!'))
 .catch(err => console.error('MongoDB connection error:', err));
 
+
+// Socket.io: xử lý sự kiện khi có người dùng kết nối
+io.use(sessionMiddleware(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+})));
+
+io.on('connection', (socket) => {
+    console.log('A user connected:', socket.id);
+
+    // Khi người dùng gia nhập phòng chat
+    socket.on('joinRoom', (chatId) => {
+        socket.join(chatId);  // Gia nhập phòng với chatId duy nhất
+        console.log(`User ${socket.id} joined room: ${chatId}`);
+    });
+
+    // Khi người dùng gửi tin nhắn
+    socket.on('sendMessage', (data) => {
+        console.log('Received message:', data);
+        // Kiểm tra chatId trước khi gửi tin nhắn tới phòng chat
+        socket.to(data.chatId).emit('receiveMessage', {
+            message: data.message,
+            chatId: data.chatId,
+            username: data.username
+        });
+        // Gửi tin nhắn đến tất cả những người trong phòng chat với chatId đó
+        
+    });
+
+    // Khi người dùng ngắt kết nối
+    socket.on('disconnect', () => {
+        console.log('A user disconnected:', socket.id);
+    });
+
+});
+
+
+
+
 // Routes
 const accountRoutes = require('./routes/account');
 const customerRoutes = require('./routes/customer');
 const employeeRoutes = require('./routes/employee');
 const supplierRoutes = require('./routes/supplierRoutes');
 const billRoutes = require('./routes/billRoutes');
+const Message = require('./models/message');
+const chatRoutes = require('./routes/chatRoutes');
+const loginRouter = require('./routes/login');
+const indexRouter = require('./routes/index');
 
 const Employee = require('./models/employee');
 
@@ -50,24 +105,7 @@ app.use('/customers', customerRoutes);
 app.use('/employees', employeeRoutes);
 app.use('/suppliers', supplierRoutes);
 app.use('/bills', billRoutes);
-
-
-// Real-time Messaging with socket.io
-// io.on('connection', (socket) => {
-//     console.log('A user connected');
-
-//     // Listen for new messages from clients
-//     socket.on('newMessage', (data) => {
-//         console.log(`Message from ${data.senderId} to ${data.recipientId}: ${data.content}`);
-//         // Broadcast the message to the specific recipient
-//         socket.to(data.recipientId).emit('newMessage', data);
-//     });
-
-//     // Handle user disconnection
-//     socket.on('disconnect', () => {
-//         console.log('A user disconnected');
-//     });
-// });
+app.use('/chat', chatRoutes);
 
 
 
@@ -80,14 +118,13 @@ app.get('/login', (req, res) => {
 // Định nghĩa route cho login
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-
-    // Tìm employee
-    const employee = await Employee.findOne({ username, password }); // Tìm employee
+    const employee = await Employee.findOne({ username, password });
     if (employee) {
         req.session.employeeId = employee._id; // Lưu ID vào session
-        return res.redirect('/'); // Chuyển hướng đến trang chính
+        res.redirect('/'); // Chuyển hướng đến trang chủ
+    } else {
+        res.status(401).send('Tên đăng nhập hoặc mật khẩu không chính xác.');
     }
-    return res.status(401).send('Tên đăng nhập hoặc mật khẩu không chính xác.');
 });
 
 // Middleware để kiểm tra đăng nhập
@@ -103,12 +140,26 @@ app.use('/employees', checkAuth, require('./routes/employee'));
 
 
 // Home route
-app.get('/', (req, res) => {
-    res.render('index');
+app.get('/', async (req, res) => {
+    const employeeId = req.session.employeeId;
+    if (!employeeId) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const employee = await Employee.findById(employeeId);
+        if (!employee) {
+            return res.status(404).send('Nhân viên không tồn tại');
+        }
+        res.render('index', { employee });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Lỗi khi truy xuất thông tin nhân viên');
+    }
 });
 
-// Server listening
+// Khởi động server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+server.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });

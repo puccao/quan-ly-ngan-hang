@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn người chat</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Chọn nhân viên để trò chuyện</h2>
+        <ul>
+            <% employees.forEach(employee => { %>
+                <li>
+                    <a href="/chat/<%= employee._id %>"><%= employee.username %> - <%= employee.position %></a>
+                </li>
+            <% }) %>
+        </ul>
+    </div>
+</body>
+</html>
