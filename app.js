@@ -21,7 +21,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use(session({
@@ -41,8 +41,8 @@ mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB connected!'))
-.catch(err => console.error('MongoDB connection error:', err));
+    .then(() => console.log('MongoDB connected!'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
 
 // Socket.io: xử lý sự kiện khi có người dùng kết nối
@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
             username: data.username
         });
         // Gửi tin nhắn đến tất cả những người trong phòng chat với chatId đó
-        
+
     });
 
     // Khi người dùng ngắt kết nối
@@ -95,7 +95,7 @@ const Message = require('./models/message');
 const chatRoutes = require('./routes/chatRoutes');
 const loginRouter = require('./routes/login');
 const indexRouter = require('./routes/index');
-
+const postRouter = require('./models/post');
 const Employee = require('./models/employee');
 
 
@@ -106,7 +106,7 @@ app.use('/employees', employeeRoutes);
 app.use('/suppliers', supplierRoutes);
 app.use('/bills', billRoutes);
 app.use('/chat', chatRoutes);
-
+app.use('/post', postRouter);
 
 
 //////////////////////
@@ -118,14 +118,29 @@ app.get('/login', (req, res) => {
 // Định nghĩa route cho login
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const employee = await Employee.findOne({ username, password });
-    if (employee) {
-        req.session.employeeId = employee._id; // Lưu ID vào session
+
+    try {
+        // Tìm nhân viên theo tên đăng nhập
+        const employee = await Employee.findOne({ username });
+        if (!employee) {
+            return res.status(401).send('Tên đăng nhập hoặc mật khẩu không chính xác.');
+        }
+
+        // So sánh mật khẩu nhập vào với mật khẩu trong cơ sở dữ liệu
+        const isMatch = await bcrypt.compare(password, employee.password);
+        if (!isMatch) {
+            return res.status(401).send('Tên đăng nhập hoặc mật khẩu không chính xác.');
+        }
+
+        // Lưu thông tin vào session nếu đăng nhập thành công
+        req.session.employeeId = employee._id;
         res.redirect('/'); // Chuyển hướng đến trang chủ
-    } else {
-        res.status(401).send('Tên đăng nhập hoặc mật khẩu không chính xác.');
+    } catch (err) {
+        console.error('Lỗi trong quá trình đăng nhập:', err);
+        res.status(500).send('Đã xảy ra lỗi trên server.');
     }
 });
+
 
 // Middleware để kiểm tra đăng nhập
 const checkAuth = (req, res, next) => {

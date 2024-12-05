@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thêm bài viết</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Thêm bài viết mới</h1>
+    <a href="/">Trở về trang chủ</a>
+  </header>
+  <main>
+    <form action="/add" method="POST">
+      <label for="title">Tiêu đề:</label>
+      <input type="text" id="title" name="title" required>
+      
+      <label for="content">Nội dung:</label>
+      <textarea id="content" name="content" required></textarea>
+      
+      <button type="submit">Thêm bài viết</button>
+    </form>
+  </main>
+</body>
+</html>
