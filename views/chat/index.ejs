@@ -4,18 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chọn người chat</title>
-    <link rel="stylesheet" href="/public/css/style.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJJ3Y5f6hBh5y+KnujsnB2dxjrrlO8TbFGcOS2U5xJlq8BwaC8g6ttz5aXyF" crossorigin="anonymous">
+
+    <!-- Icon Material Design -->
+    <link rel="stylesheet" href="/stylesheets/assets/vendors/mdi/css/materialdesignicons.min.css">
+    
+    <!-- Optional custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .employee-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .employee-item {
+            margin-bottom: 15px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .employee-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .employee-item a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .employee-item a:hover {
+            text-decoration: underline;
+        }
+
+        .employee-item .position {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
 </head>
 <body>
+
     <div class="container">
         <h2>Chọn nhân viên để trò chuyện</h2>
-        <ul>
+        <ul class="employee-list">
             <% employees.forEach(employee => { %>
-                <li>
-                    <a href="/chat/<%= employee._id %>"><%= employee.username %> - <%= employee.position %></a>
+                <li class="employee-item">
+                    <a href="/chat/<%= employee._id %>">
+                        <span><%= employee.username %></span>
+                        <span class="position">- <%= employee.position %></span>
+                    </a>
                 </li>
             <% }) %>
         </ul>
     </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0U1kJ5YkPfTp9cmBstlqp0z3Cp0H9EZ92HqIzkjZs94mVpoG" crossorigin="anonymous"></script>
 </body>
 </html>
