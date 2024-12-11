@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo');
 const path = require('path');
 const app = express();
 const socketIo = require('socket.io');
@@ -21,7 +22,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
+
 app.use(cors());
 
 app.use(session({
@@ -44,6 +45,16 @@ mongoose.connect(process.env.MONGODB_URI, {
     .then(() => console.log('MongoDB connected!'))
     .catch(err => console.error('MongoDB connection error:', err));
 
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        ttl: 24 * 60 * 60 // Thời gian sống của session (24 giờ)
+    }),
+    cookie: { secure: false, httpOnly: true }
+}));
 
 // Socket.io: xử lý sự kiện khi có người dùng kết nối
 io.use(sessionMiddleware(session({
@@ -95,7 +106,7 @@ const Message = require('./models/message');
 const chatRoutes = require('./routes/chatRoutes');
 const loginRouter = require('./routes/login');
 const indexRouter = require('./routes/index');
-const postRouter = require('./models/post');
+const blogRouter = require('./routes/blogRouter');
 const Employee = require('./models/employee');
 
 
@@ -106,7 +117,7 @@ app.use('/employees', employeeRoutes);
 app.use('/suppliers', supplierRoutes);
 app.use('/bills', billRoutes);
 app.use('/chat', chatRoutes);
-app.use('/post', postRouter);
+app.use('/blog', blogRouter);
 
 
 //////////////////////
